@@ -1,0 +1,64 @@
+# Unity Generated
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+MemoryCaptures/
+
+# Crash Reports
+sysinfo.txt
+
+# Auto-generated VS/JetBrains
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+
+# Unity Cache
+*.pidb.meta
+*.pdb
+*.mdb
+
+# OS generated
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Rider
+.idea/
+*.sln.iml
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# Builds
+*.apk
+*.aab
+*.exe
+*.app
+*.ipa
+
+# Addressables Build
+Assets/AddressableAssetsData/*/Build*
+Assets/AddressableAssetsData/*/assetbundles
+
+# Collab (Unity Cloud Collaboration)
+.collab/
+
+# Plastic SCM
+.Plastic/
+.ignore
