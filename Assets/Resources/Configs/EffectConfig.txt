@@ -1,0 +1,30 @@
+{
+  "$type": "System.Collections.Generic.Dictionary`2[[System.Int32, mscorlib],[BaseConfig, Assembly-CSharp]], mscorlib",
+  "201": {
+    "$type": "EffectConfig, Assembly-CSharp",
+    "name": "巨大的",
+    "desc": "物体的高度变为2倍",
+    "param": [
+      0
+    ],
+    "id": 201
+  },
+  "202": {
+    "$type": "EffectConfig, Assembly-CSharp",
+    "name": "渺小的",
+    "desc": "物体的高度变为二分之一倍",
+    "param": [
+      0
+    ],
+    "id": 202
+  },
+  "203": {
+    "$type": "EffectConfig, Assembly-CSharp",
+    "name": "红温的",
+    "desc": "红温",
+    "param": [
+      0
+    ],
+    "id": 203
+  }
+}

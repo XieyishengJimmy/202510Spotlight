@@ -1,0 +1,12 @@
+{
+  "$type": "System.Collections.Generic.Dictionary`2[[System.Int32, mscorlib],[BaseConfig, Assembly-CSharp]], mscorlib",
+  "101": {
+    "$type": "ObjectConfig, Assembly-CSharp",
+    "name": "可变方块",
+    "desc": "可以自由变化的方块",
+    "width": 1,
+    "height": 1,
+    "color": 0,
+    "id": 101
+  }
+}
