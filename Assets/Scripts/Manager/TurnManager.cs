@@ -62,6 +62,8 @@ public class TurnManager : MonoBehaviour
         MapManager.instance.ActionHandler(oldEffects, newEffects);
         lastTurnEffect = newEffects;
 
+        MapManager.instance.SimGravity(MapManager.instance.player);
+
         turnCount++;
     }
 

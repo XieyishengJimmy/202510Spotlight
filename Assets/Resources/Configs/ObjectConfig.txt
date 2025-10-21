@@ -8,5 +8,14 @@
     "height": 1,
     "color": 0,
     "id": 101
+  },
+  "999": {
+    "$type": "ObjectConfig, Assembly-CSharp",
+    "name": "玩家",
+    "desc": "plyer",
+    "width": 1,
+    "height": 2,
+    "color": 0,
+    "id": 999
   }
 }

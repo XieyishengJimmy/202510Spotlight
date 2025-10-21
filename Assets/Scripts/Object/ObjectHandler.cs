@@ -7,11 +7,24 @@ public class ObjectHandler : MonoBehaviour
     //Õº∆¨π‹¿Ì
     public SpriteRenderer sp;
     public ObjectBase objb;
+    public ObjectType objt;
 
     private void Awake()
     {
         sp = transform.GetChild(0).gameObject.GetComponent<SpriteRenderer>();
-        objb = new Object101();
+
+        switch (objt)
+        {
+            case ObjectType.Player:
+                objb = new ObjectPlayer();
+                break;
+            case ObjectType.Object:
+                objb = new Object101();
+                break;
+            default:
+                break;
+        }
+
     }
 
     public void PositionAdjust()
@@ -41,4 +54,12 @@ public class ObjectHandler : MonoBehaviour
                 break;
         }
     }
+}
+
+
+
+public enum ObjectType
+{
+    Player,
+    Object,
 }

@@ -21,11 +21,11 @@ public class MapManager : MonoBehaviour
     public GameObject OBJGroup;
     public List<ObjectBase> OBJList;
 
-    public Transform player;
-    public Vector2Int playerMapPos;
+    public ObjectBase player;
 
     //临时
-    public ObjectHandler ob; 
+    public ObjectHandler ob;
+    public ObjectHandler oc;
 
     private void Awake()
     {
@@ -34,7 +34,6 @@ public class MapManager : MonoBehaviour
 
     private void OnEnable()
     {
-        player = FindObjectOfType<PlayerController>().transform;
         MapInit();
     }
 
@@ -138,16 +137,12 @@ public class MapManager : MonoBehaviour
                 }
             }
 
+            if (objb.isPlayer)
+                player = objb;
+
             objb.mapPos = new Vector2Int((int)pos.x, (int)pos.y);
-
             OBJList.Add(objb);
-            
         }
-
-
-        //记录玩家位置
-        Vector2 tempPos = WorldToGrid(player.position);
-        playerMapPos = new Vector2Int((int)tempPos.x, (int)tempPos.y);
 
     }
 
@@ -159,13 +154,18 @@ public class MapManager : MonoBehaviour
             return;
 
         bool isCanMove = true;
+        ObjectBase objb = player;
         for (int w = 0; w < width; w++)
         {
             for (int h = 0; h < height; h++)
             {
-                Vector2Int checkPos = playerMapPos + dir + new Vector2Int(w, h);
+                Vector2Int checkPos = objb.mapPos + dir + new Vector2Int(w, h);
+
                 if(!CheckEmpty(checkPos))
                 {
+                    if (mapData[checkPos.x, checkPos.y].isPlayer == true)
+                        continue;
+
                     isCanMove = false;
                     break;
                 }
@@ -176,9 +176,22 @@ public class MapManager : MonoBehaviour
         if (!isCanMove)
             return;
 
-        playerMapPos += dir;
-        player.position = GridToWorld(playerMapPos);
+        foreach (var pos in objb.gridLock)
+        {
+            mapData[pos.x, pos.y] = null;
+        }
 
+        objb.gridLock.Clear();
+        objb.mapPos += dir;
+        for (int j = 0; j < objb.obj.width; j++)
+        {
+            for (int k = 0; k < objb.obj.height; k++)
+            {
+                mapData[objb.mapPos.x + j, objb.mapPos.y + k] = objb;
+                objb.gridLock.Add(new Vector2Int(objb.mapPos.x + j, objb.mapPos.y + k));
+            }
+        }
+        objb.AdjustPosition();
 
     }
 
@@ -187,6 +200,11 @@ public class MapManager : MonoBehaviour
     public void GoOb()
     {
         ActionAdd(ob.objb.effectList);
+    }
+
+    public void GoOc()
+    {
+        ActionAdd(oc.objb.effectList);
     }
 
     //触发之后给回合管理器新的效果列表
@@ -221,7 +239,6 @@ public class MapManager : MonoBehaviour
                 break;
             case 201:
                 Effect201(objb, isNewEffect);
-                Debug.Log(isNewEffect);
                 break;
             case 202:
                 Effect202(objb, isNewEffect);
@@ -237,7 +254,6 @@ public class MapManager : MonoBehaviour
 
     public void Effect201(ObjectBase objb, bool isNewEffect)
     {
-
         int oldHeight = objb.obj.height;
         int newHeight = isNewEffect ? oldHeight * 2 : Mathf.Max(1, oldHeight / 2);
 
@@ -258,7 +274,7 @@ public class MapManager : MonoBehaviour
             
             objb.obj.height = newHeight;
             objb.AdjustAll();
-            //触发其他物体根据重力下落的函数
+
             return;
         }
 
@@ -283,6 +299,21 @@ public class MapManager : MonoBehaviour
             objb.obj.color = 1;
         else
             objb.obj.color = 0;
+    }
+
+
+    //玩家的重力模拟
+    public void SimGravity(ObjectBase objb)
+    {
+        Debug.Log(objb);
+        int downDelta = 0;
+        while (CheckEmpty(new Vector2Int(objb.mapPos.x,objb.mapPos.y - downDelta - 1)))
+        {
+            downDelta++;
+            Debug.Log(12654);
+        }
+
+        PlayerMove(new Vector2Int(0,-downDelta), player.obj.width, player.obj.height);
     }
 
 
@@ -450,7 +481,7 @@ public class MapManager : MonoBehaviour
 
         // 更新位置
         target.mapPos = new Vector2Int(target.mapPos.x, target.mapPos.y + amount);
-        target.AdjustAll();
+        target.AdjustPosition();
 
         // 写入新位置
         for (int dy = 0; dy < target.obj.height; dy++)
