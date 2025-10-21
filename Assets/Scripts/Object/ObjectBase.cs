@@ -6,7 +6,7 @@ public class ObjectBase
 {
     //基本数据
     public bool isWall;
-    public bool isPlayer = false;
+    public bool isPlayer;
     public ObjectConfig obj;
     public Vector2Int mapPos;
 
@@ -38,6 +38,20 @@ public class ObjectBase
             {
                 handler.SizeAdjust();
                 handler.ColorAdjust();
+                handler.PositionAdjust();
+                break;
+            }
+        }
+    }
+
+    public void AdjustPosition()
+    {
+        ObjectHandler[] handlers = GameObject.FindObjectsOfType<ObjectHandler>();
+
+        foreach (var handler in handlers)
+        {
+            if (handler.objb == this)
+            {
                 handler.PositionAdjust();
                 break;
             }

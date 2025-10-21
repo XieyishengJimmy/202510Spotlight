@@ -6,8 +6,18 @@ public class Object101 : ObjectBase
 {
     public override void Init()
     {
-        obj = ConfigManager.Instance.GetConfig<ObjectConfig>(101);
+        obj = new ObjectConfig();
+        ObjectConfig tempObj = ConfigManager.Instance.GetConfig<ObjectConfig>(101);
+
+        obj.name = tempObj.name;
+        obj.desc = tempObj.desc;
+        obj.width = tempObj.width;
+        obj.height = tempObj.height;
+        obj.color = tempObj.color;
+
+
         isWall = false;
+        isPlayer = false;
         gridLock = new List<Vector2Int>();
         effectList = new SingleEffect[3];
 
