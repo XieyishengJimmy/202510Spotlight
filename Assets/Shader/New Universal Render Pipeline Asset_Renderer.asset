@@ -71,7 +71,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6783c22faa23b034ba4de81e397afcd9, type: 3}
   m_Name: CRTScreenPostProcessFeature
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   settings:
     material: {fileID: 2100000, guid: a0f8e3e8ab4a12249821a165ddcd4d42, type: 2}
     renderPassEvent: 500

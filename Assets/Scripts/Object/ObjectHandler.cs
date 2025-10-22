@@ -24,7 +24,6 @@ public class ObjectHandler : MonoBehaviour
             default:
                 break;
         }
-
     }
 
     public void PositionAdjust()

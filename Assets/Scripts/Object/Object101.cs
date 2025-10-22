@@ -21,13 +21,6 @@ public class Object101 : ObjectBase
         gridLock = new List<Vector2Int>();
         effectList = new SingleEffect[3];
 
-        for (int i = 0; i < effectList.Length; i++)
-        {
-            effectList[i] = new SingleEffect();
-            effectList[i].objb = this;
-            effectList[i].effect = 201;
-        }
-
     }
 
 }

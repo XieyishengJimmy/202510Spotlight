@@ -32,7 +32,7 @@ public class MapManager : MonoBehaviour
         instance = this;
     }
 
-    private void OnEnable()
+    private void Start()
     {
         MapInit();
     }
@@ -277,20 +277,40 @@ public class MapManager : MonoBehaviour
 
             return;
         }
-
         int delta = newHeight - oldHeight;
-
         int added = TryGrowHeight(objb, delta);
-        
         objb.AdjustAll();
     }
 
     public void Effect202(ObjectBase objb, bool isNewEffect)
     {
+        int oldHeight = objb.obj.height;
+        int newHeight = isNewEffect ? Mathf.Max(1, oldHeight / 2) : oldHeight * 2;
+
+        foreach (var pos in objb.gridLock)
+        {
+            mapData[pos.x, pos.y] = null;
+        }
+
+        objb.gridLock.Clear();
+
         if (isNewEffect)
-            objb.obj.height = objb.obj.height / 2 >= 1 ? objb.obj.height / 2 : 1;
-        else
-            objb.obj.height = objb.obj.height * 2;
+        {
+            for (int i = 0; i < newHeight; i++)
+            {
+                mapData[objb.mapPos.x, objb.mapPos.y + i] = objb;
+                objb.gridLock.Add(new Vector2Int(objb.mapPos.x, objb.mapPos.y + i));
+            }
+
+            objb.obj.height = newHeight;
+            objb.AdjustAll();
+
+            return;
+        }
+
+        int delta = newHeight - oldHeight;
+        int added = TryGrowHeight(objb, delta);
+        objb.AdjustAll();
     }
 
     public void Effect203(ObjectBase objb, bool isNewEffect)
