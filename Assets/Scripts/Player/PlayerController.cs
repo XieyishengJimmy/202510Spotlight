@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        if(TurnManager.instance.readyToMove)
+        if(TurnManager.instance.readyToMove && !MapManager.instance.isPlayerDead)
         GetKeys();
     }
 
@@ -49,16 +49,16 @@ public class PlayerController : MonoBehaviour
             switch (key)
             {
                 case PlayerAction.W:
-                    MapManager.instance.PlayerMove(new Vector2Int(0,1),playerWidth,playerheight);
+                    //MapManager.instance.PlayerMove(new Vector2Int(0,1));
                     break;
                 case PlayerAction.S:
-                    MapManager.instance.PlayerMove(new Vector2Int(0, -1), playerWidth, playerheight);
+                    //MapManager.instance.PlayerMove(new Vector2Int(0, -1));
                     break;
                 case PlayerAction.A:
-                    MapManager.instance.PlayerMove(new Vector2Int(-1, 0), playerWidth, playerheight);
+                    MapManager.instance.PlayerMove(new Vector2Int(-1, 0));
                     break;
                 case PlayerAction.D:
-                    MapManager.instance.PlayerMove(new Vector2Int(1, 0), playerWidth, playerheight);
+                    MapManager.instance.PlayerMove(new Vector2Int(1, 0));
                     break;
                 default:
                     break;

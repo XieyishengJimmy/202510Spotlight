@@ -8,6 +8,8 @@ public class MapManager : MonoBehaviour
 {
     public static MapManager instance;
 
+    public bool isPlayerDead;
+
     //地图物件管理储存二维数组
     public ObjectBase[,] mapData;
 
@@ -148,18 +150,15 @@ public class MapManager : MonoBehaviour
 
 
     //玩家移动控制
-    public void PlayerMove(Vector2Int dir, int width, int height)
+    public void PlayerMove(Vector2Int dir)
     {
-        if (!TurnManager.instance.readyToMove)
-            return;
 
         bool isCanMove = true;
-        ObjectBase objb = player;
-        for (int w = 0; w < width; w++)
+        for (int w = 0; w < player.obj.width; w++)
         {
-            for (int h = 0; h < height; h++)
+            for (int h = 0; h < player.obj.height; h++)
             {
-                Vector2Int checkPos = objb.mapPos + dir + new Vector2Int(w, h);
+                Vector2Int checkPos = player.mapPos + dir + new Vector2Int(w, h);
 
                 if(!CheckEmpty(checkPos))
                 {
@@ -176,22 +175,58 @@ public class MapManager : MonoBehaviour
         if (!isCanMove)
             return;
 
-        foreach (var pos in objb.gridLock)
+        PlayerPosChange(dir);
+        if (SimGravity(player) > 1)
+            isPlayerDead = true;
+
+        if (isPlayerDead)
+        {
+            Debug.Log("DEAD");
+            return;
+        }
+
+        TriggerCheck();
+        TurnManager.instance.TurnAction();
+    }
+
+
+
+    public void PlayerPosChange(Vector2Int dir)
+    {
+        foreach (var pos in player.gridLock)
         {
             mapData[pos.x, pos.y] = null;
         }
 
-        objb.gridLock.Clear();
-        objb.mapPos += dir;
-        for (int j = 0; j < objb.obj.width; j++)
+        player.gridLock.Clear();
+        player.mapPos += dir;
+        for (int j = 0; j < player.obj.width; j++)
         {
-            for (int k = 0; k < objb.obj.height; k++)
+            for (int k = 0; k < player.obj.height; k++)
             {
-                mapData[objb.mapPos.x + j, objb.mapPos.y + k] = objb;
-                objb.gridLock.Add(new Vector2Int(objb.mapPos.x + j, objb.mapPos.y + k));
+                mapData[player.mapPos.x + j, player.mapPos.y + k] = player;
+                player.gridLock.Add(new Vector2Int(player.mapPos.x + j, player.mapPos.y + k));
             }
         }
-        objb.AdjustPosition();
+        player.AdjustPosition();
+    }
+
+
+
+    public void TriggerCheck()
+    {
+        ObjectHandler[] handlers = GameObject.FindObjectsOfType<ObjectHandler>();
+
+        foreach (var handler in handlers)
+        {
+            if (handler.objb == mapData[player.mapPos.x, player.mapPos.y -1])
+            {
+                if(handler.GetComponent<TriggerObject>()!= null)
+                {
+                    handler.GetComponent<TriggerObject>().TriggerEffect();
+                }
+            }
+        }
 
     }
 
@@ -323,19 +358,25 @@ public class MapManager : MonoBehaviour
 
 
     //玩家的重力模拟
-    public void SimGravity(ObjectBase objb)
+    public int SimGravity(ObjectBase objb)
     {
-        Debug.Log(objb);
         int downDelta = 0;
         while (CheckEmpty(new Vector2Int(objb.mapPos.x,objb.mapPos.y - downDelta - 1)))
         {
             downDelta++;
-            Debug.Log(12654);
         }
 
-        PlayerMove(new Vector2Int(0,-downDelta), player.obj.width, player.obj.height);
+        if(downDelta>0)
+        PlayerPosChange(new Vector2Int(0,-downDelta));
+
+        return downDelta;
     }
 
+
+    public void PlayerDie()
+    {
+
+    }
 
 
     public bool IsInsideGrid(Vector2Int p)

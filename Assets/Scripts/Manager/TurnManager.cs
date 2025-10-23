@@ -38,6 +38,8 @@ public class TurnManager : MonoBehaviour
 
     public void TurnAction()
     {
+        readyToMove = false;
+
         List<SingleEffect> oldEffects = new List<SingleEffect>(lastTurnEffect);
         lastTurnEffect.Clear();
         List<SingleEffect> newEffects = new List<SingleEffect>();
@@ -62,11 +64,12 @@ public class TurnManager : MonoBehaviour
         MapManager.instance.ActionHandler(oldEffects, newEffects);
         lastTurnEffect = newEffects;
 
-        MapManager.instance.SimGravity(MapManager.instance.player);
+
+        int delta =  MapManager.instance.SimGravity(MapManager.instance.player);
 
         turnCount++;
+        readyToMove = true;
     }
-
 
 }
 
