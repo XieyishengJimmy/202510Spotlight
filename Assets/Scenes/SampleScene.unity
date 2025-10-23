@@ -1273,7 +1273,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Target: {fileID: 1547408995}
-  Size: 0
+  Size: 20.1
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -5486,6 +5486,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7aa2ee7094e48a14a9a6ded33c1fed65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isPlayerDead: 0
   map: {fileID: 1742143091}
   wall: {fileID: 2539484}
   sideLength: {x: 0, y: 0}
@@ -5868,24 +5869,40 @@ PrefabInstance:
       value: BlackMask
       objectReference: {fileID: 0}
     - target: {fileID: 5976024023475146562, guid: 620e4fba3ed2f1d4fab576ef7ce36f56, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0.43489584
+      objectReference: {fileID: 0}
+    - target: {fileID: 5976024023475146562, guid: 620e4fba3ed2f1d4fab576ef7ce36f56, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0.462
+      objectReference: {fileID: 0}
+    - target: {fileID: 5976024023475146562, guid: 620e4fba3ed2f1d4fab576ef7ce36f56, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0.43489584
+      objectReference: {fileID: 0}
+    - target: {fileID: 5976024023475146562, guid: 620e4fba3ed2f1d4fab576ef7ce36f56, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0.462
+      objectReference: {fileID: 0}
+    - target: {fileID: 5976024023475146562, guid: 620e4fba3ed2f1d4fab576ef7ce36f56, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0
+      value: 20.1
       objectReference: {fileID: 0}
     - target: {fileID: 5976024023475146562, guid: 620e4fba3ed2f1d4fab576ef7ce36f56, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0
+      value: 20.1
       objectReference: {fileID: 0}
     - target: {fileID: 5976024023475146562, guid: 620e4fba3ed2f1d4fab576ef7ce36f56, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0
+      value: 20.1
       objectReference: {fileID: 0}
     - target: {fileID: 5976024023475146562, guid: 620e4fba3ed2f1d4fab576ef7ce36f56, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -32
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 5976024023475146562, guid: 620e4fba3ed2f1d4fab576ef7ce36f56, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -111
+      value: -51
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5203898162074852313, guid: 620e4fba3ed2f1d4fab576ef7ce36f56, type: 3}
