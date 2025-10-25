@@ -1769,7 +1769,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.26820126, g: 0.26977074, b: 0.27223712, a: 0}
+  m_BackGroundColor: {r: 0.0627451, g: 0.1137255, b: 0.19215688, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -5486,7 +5486,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7aa2ee7094e48a14a9a6ded33c1fed65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isPlayerDead: 0
+  isPlayerDead: 1
   map: {fileID: 1742143091}
   wall: {fileID: 2539484}
   sideLength: {x: 0, y: 0}
