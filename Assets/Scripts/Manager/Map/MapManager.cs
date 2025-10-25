@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.Pool;
+using DG.Tweening;
+using System.Threading.Tasks;
 
 public class MapManager : MonoBehaviour
 {
@@ -21,13 +23,11 @@ public class MapManager : MonoBehaviour
 
     //物件集合
     public GameObject OBJGroup;
+    public GameObject functionalGroup;
     public List<ObjectBase> OBJList;
 
     public ObjectBase player;
 
-    //临时
-    public ObjectHandler ob;
-    public ObjectHandler oc;
 
     private void Awake()
     {
@@ -146,6 +146,17 @@ public class MapManager : MonoBehaviour
             OBJList.Add(objb);
         }
 
+        //获取功能物品位置
+        for (int i = 0; i < functionalGroup.transform.childCount; i++)
+        {
+            var obj = functionalGroup.transform.GetChild(i);
+            var pos = WorldToGrid(obj.position);
+            var func = obj.GetComponent<FunctionalObject>();
+
+            func.mapPos = pos;
+        }
+
+
     }
 
 
@@ -175,6 +186,8 @@ public class MapManager : MonoBehaviour
         if (!isCanMove)
             return;
 
+        TurnManager.instance.readyToMove = false;
+
         PlayerPosChange(dir);
         if (SimGravity(player) > 1)
             isPlayerDead = true;
@@ -190,7 +203,7 @@ public class MapManager : MonoBehaviour
     }
 
 
-
+    //玩家角色移动
     public void PlayerPosChange(Vector2Int dir)
     {
         foreach (var pos in player.gridLock)
@@ -208,11 +221,11 @@ public class MapManager : MonoBehaviour
                 player.gridLock.Add(new Vector2Int(player.mapPos.x + j, player.mapPos.y + k));
             }
         }
-        player.AdjustPosition();
+        player.PlayerMove();
     }
 
 
-
+    //踩触发器检查
     public void TriggerCheck()
     {
         ObjectHandler[] handlers = GameObject.FindObjectsOfType<ObjectHandler>();
@@ -230,56 +243,90 @@ public class MapManager : MonoBehaviour
 
     }
 
-
-    //临时
-    public void GoOb()
+    //功能对象触发
+    public void FunctionalCheck()
     {
-        ActionAdd(ob.objb.effectList);
+        for (int i = 0; i < functionalGroup.transform.childCount; i++)
+        {
+            var func = functionalGroup.transform.GetChild(i).GetComponent<FunctionalObject>();
+            if (player.mapPos == func.mapPos)
+            {
+                if(func.type == FunctionalObjectType.Editor)
+                {
+                    Debug.Log("editor");
+                }
+                else
+                {
+                    Debug.Log("des");
+                }
+            }
+        }
     }
 
-    public void GoOc()
-    {
-        ActionAdd(oc.objb.effectList);
-    }
+
+    ////临时
+    //public void GoOb()
+    //{
+    //    ActionAdd(ob.objb.effectList);
+    //}
+
+    //public void GoOc()
+    //{
+    //    ActionAdd(oc.objb.effectList);
+    //}
 
     //触发之后给回合管理器新的效果列表
-    public void ActionAdd(SingleEffect[] effectList)
+    public void ActionAdd(List<EffectGroup> effectGroup)
     {
-        TurnManager.instance.ActionAdd(effectList);
+        TurnManager.instance.ActionAdd(effectGroup);
     }
 
 
     //统一处理所有需要处理的效果
-    public void ActionHandler(List<SingleEffect> oldEffects,List<SingleEffect> newEffects)
+    public void ActionHandler(List<EffectGroup> newEffects)
     {
-        foreach (var effect in oldEffects)
-        {
-            EffectHandle(effect.objb, effect.effect, false);
-        }
-
         foreach (var effect in newEffects)
         {
-            EffectHandle(effect.objb, effect.effect, true);
+            for (int i = 0; i < OBJGroup.transform.childCount; i++)
+            {
+                var obj = OBJGroup.transform.GetChild(i);
+                ObjectHandler objH = obj.gameObject.GetComponent<ObjectHandler>();
+
+                if (objH.group != effect.group)
+                    continue;
+
+                var tObj = objH.objb;
+                EffectHandle(tObj, effect.effect);
+            }
         }
 
     }
 
 
-    //根据id分配给各个处理模块
-    public void EffectHandle(ObjectBase objb, int effect, bool isNewEffect)
+    //根据类型分配给各个处理模块
+    public void EffectHandle(ObjectBase objb, EffectType effect)
     {
         switch (effect)
         {
             case 0:
                 break;
-            case 201:
-                Effect201(objb, isNewEffect);
+            case EffectType.Taller:
+                EffectTaller(objb);
                 break;
-            case 202:
-                Effect202(objb, isNewEffect);
+            case EffectType.Shorter:
+                EffectShorter(objb);
                 break;
-            case 203:
-                Effect203(objb, isNewEffect);
+            case EffectType.Hollow:
+                EffectHollow(objb);
+                break;
+            case EffectType.Reset:
+                EffectReset(objb);
+                break;
+            case EffectType.MoveLeft:
+                EffectMoveLeft(objb);
+                break;
+            case EffectType.MoveRight:
+                EffectMoveRight(objb);
                 break;
             default:
                 break;
@@ -287,10 +334,20 @@ public class MapManager : MonoBehaviour
     }
 
 
-    public void Effect201(ObjectBase objb, bool isNewEffect)
+    //上升
+    public void EffectTaller(ObjectBase objb)
     {
-        int oldHeight = objb.obj.height;
-        int newHeight = isNewEffect ? oldHeight * 2 : Mathf.Max(1, oldHeight / 2);
+        int added = TryGrowHeight(objb, 1);
+        objb.AdjustAll();
+    }
+
+    //下降
+    public void EffectShorter(ObjectBase objb)
+    {
+        objb.obj.height = Mathf.Max(1, objb.obj.height - 1);
+
+        if (objb.obj.hollow)
+            return;
 
         foreach (var pos in objb.gridLock)
         {
@@ -298,62 +355,73 @@ public class MapManager : MonoBehaviour
         }
 
         objb.gridLock.Clear();
-
-        if(!isNewEffect)
+        
+        for (int i = 0; i < objb.obj.height; i++)
         {
-            for (int i = 0; i < newHeight; i++)
-            {
-                mapData[objb.mapPos.x, objb.mapPos.y + i] = objb;
-                objb.gridLock.Add(new Vector2Int(objb.mapPos.x, objb.mapPos.y + i));
-            }
-            
-            objb.obj.height = newHeight;
-            objb.AdjustAll();
-
-            return;
+            mapData[objb.mapPos.x, objb.mapPos.y + i] = objb;
+            objb.gridLock.Add(new Vector2Int(objb.mapPos.x, objb.mapPos.y + i));
         }
-        int delta = newHeight - oldHeight;
-        int added = TryGrowHeight(objb, delta);
+
         objb.AdjustAll();
     }
 
-    public void Effect202(ObjectBase objb, bool isNewEffect)
+    //变透明
+    public void EffectHollow(ObjectBase objb)
     {
-        int oldHeight = objb.obj.height;
-        int newHeight = isNewEffect ? Mathf.Max(1, oldHeight / 2) : oldHeight * 2;
-
+        objb.obj.hollow = true;
         foreach (var pos in objb.gridLock)
         {
             mapData[pos.x, pos.y] = null;
         }
+        objb.AdjustAll();
+    }
 
-        objb.gridLock.Clear();
-
-        if (isNewEffect)
+    //一切还原
+    public void EffectReset(ObjectBase objb)
+    {
+        objb.obj.hollow = objb.oData.isHollow;
+        if(objb.oData.size.y > objb.obj.height)
         {
-            for (int i = 0; i < newHeight; i++)
+            int delta = objb.oData.size.y - objb.obj.height;
+            int added = TryGrowHeight(objb, delta);
+            objb.AdjustAll();
+        }
+        else if(objb.oData.size.y < objb.obj.height)
+        {
+            objb.obj.height = Mathf.Max(1, objb.oData.size.y);
+
+            foreach (var pos in objb.gridLock)
+            {
+                mapData[pos.x, pos.y] = null;
+            }
+
+            objb.gridLock.Clear();
+
+            for (int i = 0; i < objb.obj.height; i++)
             {
                 mapData[objb.mapPos.x, objb.mapPos.y + i] = objb;
                 objb.gridLock.Add(new Vector2Int(objb.mapPos.x, objb.mapPos.y + i));
             }
 
-            objb.obj.height = newHeight;
             objb.AdjustAll();
-
-            return;
         }
-
-        int delta = newHeight - oldHeight;
-        int added = TryGrowHeight(objb, delta);
-        objb.AdjustAll();
-    }
-
-    public void Effect203(ObjectBase objb, bool isNewEffect)
-    {
-        if (isNewEffect)
-            objb.obj.color = 1;
         else
-            objb.obj.color = 0;
+        {
+            objb.AdjustAll();
+        }
+    }
+
+    //整体向左移动
+    public void EffectMoveLeft(ObjectBase objb)
+    {
+
+    }
+
+
+    //整体向右移动
+    public void EffectMoveRight(ObjectBase objb)
+    {
+
     }
 
 
@@ -372,13 +440,13 @@ public class MapManager : MonoBehaviour
         return downDelta;
     }
 
-
+    //玩家死亡相关
     public void PlayerDie()
     {
 
     }
 
-
+    //检查是否出界
     public bool IsInsideGrid(Vector2Int p)
     {
         return p.x >= 0 && p.y >= 0 && p.x < mapData.GetLength(0) && p.y < mapData.GetLength(1);
@@ -396,10 +464,30 @@ public class MapManager : MonoBehaviour
 
 
     //坐标系坐标和世界坐标的转换
-    public Vector2 WorldToGrid(Vector2 pos)
+    public Vector2Int WorldToGrid(Vector2 pos)
     {
-        var newPos = new Vector2(pos.x - transform.position.x + offset.x - 0.5f, pos.y - transform.position.y + offset.y - 0.5f);
+        var newPos = new Vector2Int((int)(pos.x - transform.position.x + offset.x - 0.5f), (int)(pos.y - transform.position.y + offset.y - 0.5f));
         return newPos;
+    }
+
+
+    //赋予Group里的所有触发器effectlise
+    public void SetTrigger(TriggerGroup tGroup, List<EffectGroup> list)
+    {
+        for (int i = 0; i < OBJGroup.transform.childCount; i++)
+        {
+            var obj = OBJGroup.transform.GetChild(i);
+            ObjectHandler objH = obj.gameObject.GetComponent<ObjectHandler>();
+
+            if (objH.group != tGroup)
+                continue;
+
+            if (objH.GetComponent<TriggerObject>() == null)
+                continue;
+
+            var tObj = objH.GetComponent<TriggerObject>();
+            tObj.effectList = list;
+        }
     }
 
     public Vector2 GridToWorld(Vector2 pos)
@@ -427,7 +515,10 @@ public class MapManager : MonoBehaviour
 
             // 越界 → 停止
             if (!IsInsideGrid(new Vector2Int(baseX, checkY)))
+            {
                 break;
+            }
+                
 
             var occ = mapData[baseX, checkY];
 
@@ -489,18 +580,19 @@ public class MapManager : MonoBehaviour
         }
 
         if (occ.isWall)
+        {
+            if (target.isPlayer)
+                isPlayerDie = true;
+
             return false;
+        }
+            
 
         // 是其他物体 → 递归尝试先顶起它
         if (TryPushUpOne(occ,out isPlayerDie))
         {
             MoveObjectUp(target, 1);
             return true;
-        }
-        else
-        {
-            if (occ.isPlayer)
-                isPlayerDie = true;
         }
 
         return false;
@@ -519,6 +611,9 @@ public class MapManager : MonoBehaviour
 
         // 更新高度
         objb.obj.height += actualAdded;
+
+        if (objb.obj.hollow)
+            return;
 
         // 重新注册占位
         for (int dy = 0; dy < objb.obj.height; dy++)
@@ -553,4 +648,16 @@ public class MapManager : MonoBehaviour
         }
     }
 
+}
+
+
+public enum EffectType
+{
+    None,
+    Taller,
+    Shorter,
+    Hollow,
+    Reset,
+    MoveLeft,
+    MoveRight
 }

@@ -44,8 +44,8 @@ public class ColumnController : MonoBehaviour
         return new ColumnData
         {
             columnIndex = index,
-            objb = objectIcon.IsOccupied ? objectIcon.placedIcon.objb : null,
-            effectId = effectIcon.IsOccupied ? effectIcon.placedIcon.effectId : 0
+            group = objectIcon.IsOccupied ? objectIcon.placedIcon.group : TriggerGroup.None,
+            effectType = effectIcon.IsOccupied ? effectIcon.placedIcon.effectType : EffectType.None
         };
     }
 }

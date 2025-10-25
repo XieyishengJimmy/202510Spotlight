@@ -22,10 +22,19 @@ public class ColumnSlot : MonoBehaviour, IDropHandler
         if (!source.isSource) return;
 
         if (source.iconType != slotType) return;
-        if (IsOccupied) return;
 
         // 没有数量就不允许投放
         if (source.availableCount <= 0) return;
+
+        if (IsOccupied)
+        {
+            // 归还旧的数量
+            placedIcon.ReturnOneToSource();
+
+            // 销毁旧的放置实例
+            Destroy(placedIcon.gameObject);
+            placedIcon = null;
+        }
 
         // 在槽位中创建一个“放置实例”
         var placedGO = GameObject.Instantiate(source.gameObject, this.transform, false);

@@ -4,5 +4,5 @@ public class ObjectConfig : BaseConfig
     public string desc;
     public int width;
     public int height;
-    public int color;
+    public bool hollow;
 }

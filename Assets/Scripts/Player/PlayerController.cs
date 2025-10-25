@@ -7,6 +7,12 @@ public class PlayerController : MonoBehaviour
 
     public int playerWidth = 1;
     public int playerheight = 2;
+    public Animator anim;
+
+    private void Awake()
+    {
+        anim = transform.GetChild(0).GetComponent<Animator>();
+    }
 
     private void Update()
     {
@@ -32,10 +38,6 @@ public class PlayerController : MonoBehaviour
         {
             PlayerControl(PlayerAction.D);
         }
-        else if (Input.GetKeyDown(KeyCode.Space))
-        {
-            PlayerControl(PlayerAction.Sp);
-        }
     }
 
     public void PlayerControl(PlayerAction key)
@@ -49,15 +51,17 @@ public class PlayerController : MonoBehaviour
             switch (key)
             {
                 case PlayerAction.W:
-                    //MapManager.instance.PlayerMove(new Vector2Int(0,1));
+                    MapManager.instance.FunctionalCheck();
                     break;
                 case PlayerAction.S:
                     //MapManager.instance.PlayerMove(new Vector2Int(0, -1));
                     break;
                 case PlayerAction.A:
+                    anim.SetBool("isRight", false);
                     MapManager.instance.PlayerMove(new Vector2Int(-1, 0));
                     break;
                 case PlayerAction.D:
+                    anim.SetBool("isRight", true);
                     MapManager.instance.PlayerMove(new Vector2Int(1, 0));
                     break;
                 default:

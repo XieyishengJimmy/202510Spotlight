@@ -4,31 +4,25 @@ using UnityEngine;
 
 public class TriggerObject : MonoBehaviour
 {
-    public List<SingleEffect> effectList;
+    public List<EffectGroup> effectList;
 
     private void Awake()
     {
-        effectList = new List<SingleEffect>();
+        effectList = new List<EffectGroup>();
     }
+
 
     public void TriggerEffect()
     {
-        SingleEffect[] effectArray = new SingleEffect[effectList.Count];
-        for (int i = 0; i < effectArray.Length; i++)
-        {
-            effectArray[i] = effectList[i];
-        }
-        MapManager.instance.ActionAdd(effectArray);
+        MapManager.instance.ActionAdd(effectList);
     }
 
-    public void LookLook()
-    {
-        int index = 0;
-        foreach (var item in effectList)
-        {
-            index++;
-            Debug.Log($"ÐòºÅ = {index},OBJ={item.objb},effect={item.effect}");
-        }
-    }
+}
 
+public enum TriggerGroup
+{
+    None,
+    GroupA,
+    GroupB,
+    GroupC
 }

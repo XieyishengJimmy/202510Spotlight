@@ -14,8 +14,8 @@ public enum IconType
 
 public class DraggableIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    public int effectId;
-    public ObjectHandler objh;
+    public EffectType effectType;
+    public TriggerGroup group;
     public ObjectBase objb;
     public IconType iconType;
     Canvas canvas;
@@ -48,12 +48,6 @@ public class DraggableIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
         availableCount = maxCount;
 
         UpdateBadge();
-    }
-
-    private void Start()
-    {
-        if(iconType == IconType.Object)
-        objb = objh.objb;
     }
 
     public void UpdateBadge()

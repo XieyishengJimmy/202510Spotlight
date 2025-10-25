@@ -13,13 +13,16 @@ public class Object101 : ObjectBase
         obj.desc = tempObj.desc;
         obj.width = tempObj.width;
         obj.height = tempObj.height;
-        obj.color = tempObj.color;
+        obj.hollow = tempObj.hollow;
 
 
         isWall = false;
         isPlayer = false;
         gridLock = new List<Vector2Int>();
-        effectList = new SingleEffect[3];
+
+        oData = new OriginalData();
+        oData.size = new Vector2Int(obj.width, obj.height);
+        oData.isHollow = obj.hollow;
 
     }
 

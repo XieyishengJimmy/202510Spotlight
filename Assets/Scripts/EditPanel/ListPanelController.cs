@@ -9,7 +9,7 @@ public class ListPanelController : MonoBehaviour
     public Button addColumnButton;
     public GameObject columnPrefab;
 
-    public TriggerObject trigger;
+    public TriggerGroup group;
 
     private ListsManager manager;
     private List<ColumnController> columns = new List<ColumnController>();
@@ -72,24 +72,24 @@ public class ListPanelController : MonoBehaviour
 
     public void EffectTransform()
     {
-        trigger.effectList = ExportData();
+        MapManager.instance.SetTrigger(group, ExportData());
     }
 
 
     // 导出数据
-    public List<SingleEffect> ExportData()
+    public List<EffectGroup> ExportData()
     {
-        var list = new List<SingleEffect>();
+        var groupList = new List<EffectGroup>();
         for (int i = 0; i < columns.Count; i++)
         {
-            var sEffect = new SingleEffect();
+            var eGroup = new EffectGroup();
             var columnData = columns[i].ToData(i);
-            sEffect.objb = columnData.objb;
-            sEffect.effect = columnData.effectId;
+            eGroup.group = columnData.group;
+            eGroup.effect = columnData.effectType;
 
-            list.Add(sEffect);
+            groupList.Add(eGroup);
         }
-        return list;
+        return groupList;
     }
 
 

@@ -6,8 +6,8 @@ using UnityEngine;
 public class ColumnData
 {
     public int columnIndex;
-    public ObjectBase objb; 
-    public int effectId; 
+    public TriggerGroup group; 
+    public EffectType effectType; 
 }
 
 [System.Serializable]
