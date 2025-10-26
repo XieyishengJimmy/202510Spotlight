@@ -49,6 +49,9 @@ public class ColumnSlot : MonoBehaviour, IDropHandler
 
         // 源图标销毁其虚影
         source.DestroyGhost();
+
+        var col = GetComponentInParent<ColumnController>();
+        if (col != null) col.OnSlotChanged();
     }
 
     // 由 ColumnController 调用，强制移除当前图标并返回 pool

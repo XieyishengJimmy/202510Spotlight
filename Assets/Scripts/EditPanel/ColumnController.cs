@@ -38,6 +38,15 @@ public class ColumnController : MonoBehaviour
         parentPanel.RemoveColumn(this);
     }
 
+    public void OnSlotChanged()
+    {
+        // parentPanel 在 Init 时已赋值
+        if (parentPanel != null)
+        {
+            parentPanel.CallRefreshBotton();
+        }
+    }
+
 
     public ColumnData ToData(int index)
     {

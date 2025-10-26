@@ -46,6 +46,20 @@ public class ListPanelController : MonoBehaviour
             return;
         }
 
+        if (columns.Count > 0)
+        {
+            var lastCol = columns[columns.Count - 1];
+            bool hasObject = lastCol.objectIcon != null && lastCol.objectIcon.IsOccupied;
+            bool hasEffect = lastCol.effectIcon != null && lastCol.effectIcon.IsOccupied;
+
+            // 如果上一个没放满，就不允许继续新增
+            if (!(hasObject && hasEffect))
+            {
+                Debug.Log("上一个列未放满，禁止新增！");
+                return;
+            }
+        }
+
         // 实例化列，并插入到 addButton 之前（保持按钮在末尾）
         var go = Instantiate(columnPrefab, columnsContent);
         go.transform.SetSiblingIndex(addColumnButton.transform.GetSiblingIndex());
@@ -56,6 +70,8 @@ public class ListPanelController : MonoBehaviour
         Canvas.ForceUpdateCanvases();
         LayoutRebuilder.ForceRebuildLayoutImmediate(columnsContent as RectTransform);
         LayoutRebuilder.ForceRebuildLayoutImmediate(transform as RectTransform);
+
+        CallRefreshBotton();
 
     }
 
@@ -68,6 +84,38 @@ public class ListPanelController : MonoBehaviour
             Destroy(column.gameObject);
             // VerticalLayoutGroup 会自动让下面的上移
         }
+        CallRefreshBotton();
+    }
+
+    public void CallRefreshBotton()
+    {
+        if (manager != null)
+        {
+            manager.RefreshAllAddButtons();
+        }
+    }
+
+    public void UpdateAddButtonState()
+    {
+        bool canAdd = true;
+        if (manager != null && !manager.CanAddNewItem())
+        {
+            canAdd = false;
+        }
+
+        if (columns.Count > 0)
+        {
+            var lastCol = columns[columns.Count - 1];
+            bool hasObject = lastCol.objectIcon != null && lastCol.objectIcon.IsOccupied;
+            bool hasEffect = lastCol.effectIcon != null && lastCol.effectIcon.IsOccupied;
+            if (!(hasObject && hasEffect))
+            {
+                canAdd = false;
+            }
+        }
+
+        addColumnButton.GetComponent<Image>().color = canAdd? Color.green:Color.gray;
+
     }
 
     public void EffectTransform()

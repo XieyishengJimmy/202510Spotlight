@@ -62,6 +62,14 @@ public class ListsManager : MonoBehaviour
         if (panels.Contains(panel)) panels.Remove(panel);
     }
 
+    public void RefreshAllAddButtons()
+    {
+        foreach (var list in panels)
+        {
+            list.UpdateAddButtonState();
+        }
+    }
+
     // ---------- 获取当前全局条目数 ----------
     public int GetTotalItemCount()
     {
@@ -75,7 +83,7 @@ public class ListsManager : MonoBehaviour
     {
         if (GetTotalItemCount() >= maxTotalItems)
         {
-            Debug.LogWarning($"已达到最大条目数（{maxTotalItems}），无法再添加。");
+            //Debug.LogWarning($"已达到最大条目数（{maxTotalItems}），无法再添加。");
             return false;
         }
         return true;
