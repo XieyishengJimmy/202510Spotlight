@@ -4,20 +4,54 @@ using UnityEngine;
 
 public class ListsManager : MonoBehaviour
 {
+    public static ListsManager instance;
+
     [Header("UI References")]
     public Transform listsContainer;      // Horizontal or Vertical container that holds ListPanels
     public GameObject listPanelPrefab;
 
     [Header("限制设置")]
     public int maxTotalItems = 10;        // 在 Inspector 可修改
+    public GameObject mask;
+    public GameObject iconPanel;
 
     // 注册所有 ListPanelController
     private List<ListPanelController> panels = new List<ListPanelController>();
 
+    public bool isEditing;
+
+    private void Awake()
+    {
+        instance = this;
+    }
+
     private void Start()
     {
-        
+        EditorModelTurnOff();
     }
+
+    public void EditorModelTurnOn()
+    {
+        isEditing = true;
+        mask.SetActive(false);
+        iconPanel.SetActive(true);
+        MapManager.instance.MapReset();
+        TurnManager.instance.EffectClear();
+    }
+
+    public void EditorModelTurnOff()
+    {
+        isEditing = false;
+        mask.SetActive(true);
+        iconPanel.SetActive(false);
+
+        foreach (var list in panels)
+        {
+            list.EffectTransform();
+        }
+
+    }
+
     public void RegisterPanel(ListPanelController panel)
     {
         if (!panels.Contains(panel)) panels.Add(panel);

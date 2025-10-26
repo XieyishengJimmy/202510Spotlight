@@ -78,6 +78,7 @@ public class ObjectBase
 public class OriginalData
 {
     public Vector2Int size;
+    public Vector2Int mapPos;
     public bool isHollow;
 }
 

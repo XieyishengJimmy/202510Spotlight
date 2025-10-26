@@ -139,10 +139,15 @@ public class MapManager : MonoBehaviour
                 }
             }
 
-            if (objb.isPlayer)
-                player = objb;
-
             objb.mapPos = new Vector2Int((int)pos.x, (int)pos.y);
+
+            if (objb.isPlayer)
+            {
+                player = objb;
+                continue;
+            }
+
+            objb.oData.mapPos = new Vector2Int(objb.mapPos.x,objb.mapPos.y);
             OBJList.Add(objb);
         }
 
@@ -160,10 +165,55 @@ public class MapManager : MonoBehaviour
     }
 
 
+    public void MapReset()
+    {
+        //获取物件位置数据
+        for (int i = 0; i < OBJGroup.transform.childCount; i++)
+        {
+            var obj = OBJGroup.transform.GetChild(i);
+            ObjectHandler objH = obj.gameObject.GetComponent<ObjectHandler>();
+            ObjectBase objb = objH.objb;
+
+            if (objb.isPlayer)
+                continue;
+
+            foreach (var pos in objb.gridLock)
+            {
+                mapData[pos.x, pos.y] = null;
+            }
+        }
+
+        for (int i = 0; i < OBJGroup.transform.childCount; i++)
+        {
+            var obj = OBJGroup.transform.GetChild(i);
+            ObjectHandler objH = obj.gameObject.GetComponent<ObjectHandler>();
+            ObjectBase objb = objH.objb;
+
+            if (objb.isPlayer)
+                continue;
+
+            objb.mapPos = objb.oData.mapPos;
+            objb.obj.hollow = objb.oData.isHollow;
+            objb.obj.width = Mathf.Max(1, objb.oData.size.x);
+            objb.obj.height = Mathf.Max(1, objb.oData.size.y);
+
+            for (int j = 0; j < objb.obj.width; j++)
+            {
+                for (int k = 0; k < objb.obj.height; k++)
+                {
+                    mapData[objb.mapPos.x + j, objb.mapPos.y + k] = objb;
+                    objb.gridLock.Add(new Vector2Int(objb.mapPos.x + j, objb.mapPos.y + k));
+                }
+            }
+
+            objb.AdjustAll();
+        }
+    }
+
+
     //玩家移动控制
     public void PlayerMove(Vector2Int dir)
     {
-
         bool isCanMove = true;
         for (int w = 0; w < player.obj.width; w++)
         {
@@ -253,7 +303,7 @@ public class MapManager : MonoBehaviour
             {
                 if(func.type == FunctionalObjectType.Editor)
                 {
-                    Debug.Log("editor");
+                    ListsManager.instance.EditorModelTurnOn();
                 }
                 else
                 {
@@ -337,7 +387,7 @@ public class MapManager : MonoBehaviour
     //上升
     public void EffectTaller(ObjectBase objb)
     {
-        int added = TryGrowHeight(objb, 1);
+        TryGrowHeight(objb, 1);
         objb.AdjustAll();
     }
 
@@ -383,7 +433,7 @@ public class MapManager : MonoBehaviour
         if(objb.oData.size.y > objb.obj.height)
         {
             int delta = objb.oData.size.y - objb.obj.height;
-            int added = TryGrowHeight(objb, delta);
+            TryGrowHeight(objb, delta);
             objb.AdjustAll();
         }
         else if(objb.oData.size.y < objb.obj.height)
@@ -414,14 +464,16 @@ public class MapManager : MonoBehaviour
     //整体向左移动
     public void EffectMoveLeft(ObjectBase objb)
     {
-
+        TryMoveXOne(objb, false);
+        objb.AdjustAll();
     }
 
 
     //整体向右移动
     public void EffectMoveRight(ObjectBase objb)
     {
-
+        TryMoveXOne(objb, true);
+        objb.AdjustAll();
     }
 
 
@@ -499,11 +551,11 @@ public class MapManager : MonoBehaviour
 
     // 尝试让 objb 向上“变长” requestedDelta格
     // 如果上方有障碍则停在障碍下方，返回实际增加的高度
-    public int TryGrowHeight(ObjectBase objb, int requestedDelta)
+    public void TryGrowHeight(ObjectBase objb, int requestedDelta)
     {
         bool isPlayerDie = false;
 
-        if (requestedDelta <= 0) return 0;
+        if (requestedDelta <= 0) return;
 
         int actualAdded = 0;
         int baseX = objb.mapPos.x;
@@ -553,8 +605,6 @@ public class MapManager : MonoBehaviour
         {
             ApplyGrowth(objb, actualAdded);
         }
-
-        return actualAdded;
     }
 
 
@@ -647,6 +697,112 @@ public class MapManager : MonoBehaviour
             target.gridLock.Add(pos);
         }
     }
+
+
+    //物体尝试向左右移动（计算所有Y）
+    public void TryMoveXOne(ObjectBase objb, bool isRight)
+    {
+        bool isPlayerDie = false;
+        int baseY = objb.mapPos.y;
+        int checkX = objb.mapPos.x + (isRight?1:-1);
+
+        for (int i = 0; i < objb.obj.height; i++)
+        {
+            // 越界 → 停止
+            if (!IsInsideGrid(new Vector2Int(checkX, baseY + i)))
+            {
+                return;
+            }
+
+            var occ = mapData[checkX, baseY + i];
+
+            if (occ == null)
+                continue;
+
+            if (occ.isWall)
+                return;
+
+            if (!TryPushX(occ, isRight, out isPlayerDie))
+                return;
+        }
+
+        if (isPlayerDie)
+            Debug.Log("You dead！");
+
+        // 真正更新
+        MoveObjectX(objb, isRight);
+
+    }
+
+    private bool TryPushX(ObjectBase target, bool isRight, out bool isPlayerDie)
+    {
+        isPlayerDie = false;
+        bool isPlayerMaybeDie = false;
+        int baseY = target.mapPos.y;
+        int checkX = target.mapPos.x + (isRight ? 1 : -1);
+
+        for (int i = 0; i < target.obj.height; i++)
+        {
+            // 越界 → 停止
+            if (!IsInsideGrid(new Vector2Int(checkX, baseY + i)))
+            {
+                return false;
+            }
+
+            var occ = mapData[checkX, baseY + i];
+
+            if (occ == null)
+                continue;
+
+            if (occ.isWall)
+            {
+                if (target.isPlayer)
+                {
+                    isPlayerMaybeDie = true;
+                    continue;
+                }
+
+                return false;
+            }
+
+            if (TryPushX(occ, isRight, out isPlayerMaybeDie))
+            {
+                continue;
+            }
+
+        }
+
+        if (isPlayerMaybeDie)
+            isPlayerDie = true;
+
+        MoveObjectX(target, isRight);
+        return true;
+
+    }
+
+    private void MoveObjectX(ObjectBase target, bool isRight)
+    {
+        // 清空旧位置
+        foreach (var p in target.gridLock)
+        {
+            mapData[p.x, p.y] = null;
+        }
+        target.gridLock.Clear();
+
+        // 更新位置
+        target.mapPos = new Vector2Int(target.mapPos.x + (isRight?1:-1), target.mapPos.y);
+        target.AdjustPosition();
+
+        // 写入新位置
+        for (int dy = 0; dy < target.obj.height; dy++)
+        {
+            Vector2Int pos = new Vector2Int(target.mapPos.x, target.mapPos.y + dy);
+            mapData[pos.x, pos.y] = target;
+            target.gridLock.Add(pos);
+        }
+    }
+
+
 
 }
 

@@ -63,7 +63,13 @@ public class TurnManager : MonoBehaviour
         readyToMove = true;
     }
 
+    public void EffectClear()
+    {
+        actionList.Clear();
+    }
+
 }
+
 
 public class EffectQueue
 {
