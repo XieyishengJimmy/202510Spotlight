@@ -47,6 +47,13 @@ public class DraggableIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
         availableCount = maxCount;
 
+        if (effectType != EffectType.None)
+            iconType = IconType.Effect;
+
+        if (group != TriggerGroup.None)
+            iconType = IconType.Object;
+
+
         UpdateBadge();
     }
 

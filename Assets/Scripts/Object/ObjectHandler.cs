@@ -69,7 +69,7 @@ public class ObjectHandler : MonoBehaviour
     {
         var newPos = MapManager.instance.GridToWorld(objb.mapPos);
         anim.SetBool("isMoving", true);
-        Tween moveTween = playerTransform.DOMove(newPos, 0.8f).SetEase(Ease.OutQuad);
+        Tween moveTween = playerTransform.DOMove(newPos, 0.3f).SetEase(Ease.OutQuad);
         yield return moveTween.WaitForCompletion();
         anim.SetBool("isMoving", false);
     }
