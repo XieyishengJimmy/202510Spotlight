@@ -62,8 +62,7 @@ public class DraggableIcon : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
         if (countBadge != null)
         {
             countBadge.text = availableCount.ToString();
-            // 可根据需要改变颜色或显隐
-            countBadge.color = availableCount > 0 ? Color.white : new Color(1f, 1f, 1f, 0.5f);
+            //countBadge.color = availableCount > 0 ? Color.white : new Color(1f, 1f, 1f, 0.5f);
         }
     }
 
