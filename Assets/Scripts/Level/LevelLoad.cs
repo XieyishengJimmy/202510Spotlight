@@ -6,10 +6,16 @@ using UnityEngine.SceneManagement;
 public class LevelLoad : MonoBehaviour
 {
     public int levelIndex;
+    public string levelName;
 
     public void LoadLevel()
     {
         SceneManager.LoadScene(levelIndex + 1);
+    }
+
+    public void LoadLevelByName()
+    {
+        SceneManager.LoadScene(levelName);
     }
 
     public void Exit()
