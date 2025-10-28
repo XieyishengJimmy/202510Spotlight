@@ -3280,7 +3280,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 841458849}
         m_TargetAssemblyTypeName: LevelLoad, Assembly-CSharp
-        m_MethodName: LoadLevel
+        m_MethodName: LoadLevelByName
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3333,7 +3333,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levelIndex: 0
-  levelName: 
+  levelName: Beginning
 --- !u!222 &841458850
 CanvasRenderer:
   m_ObjectHideFlags: 0
