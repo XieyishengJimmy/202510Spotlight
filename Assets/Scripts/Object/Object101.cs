@@ -11,8 +11,8 @@ public class Object101 : ObjectBase
 
         obj.name = tempObj.name;
         obj.desc = tempObj.desc;
-        obj.width = tempObj.width;
-        obj.height = tempObj.height;
+        obj.width = oData.size.x;
+        obj.height = oData.size.y;
         obj.hollow = tempObj.hollow;
 
 
@@ -20,8 +20,6 @@ public class Object101 : ObjectBase
         isPlayer = false;
         gridLock = new List<Vector2Int>();
 
-        oData = new OriginalData();
-        oData.size = new Vector2Int(obj.width, obj.height);
         oData.isHollow = obj.hollow;
 
     }

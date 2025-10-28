@@ -15,6 +15,8 @@ public class ObjectHandler : MonoBehaviour
     public Transform playerTransform;
     public Animator anim;
 
+    public Vector2Int oSize;
+
     private void Awake()
     {
         sp = transform.GetChild(0).gameObject.GetComponent<SpriteRenderer>();
@@ -37,6 +39,9 @@ public class ObjectHandler : MonoBehaviour
             default:
                 break;
         }
+
+        objb.oData = new OriginalData();
+        objb.oData.size = oSize;
     }
 
     public void PositionAdjust()
@@ -62,16 +67,16 @@ public class ObjectHandler : MonoBehaviour
 
     public void PlayerMoveAnim()
     {
-        StartCoroutine(PlayerMoveDoTween());
+        //StartCoroutine(PlayerMoveDoTween());
+        var newPos = MapManager.instance.GridToWorld(objb.mapPos);
+        playerTransform.position = newPos;
     }
 
     public IEnumerator PlayerMoveDoTween()
     {
         var newPos = MapManager.instance.GridToWorld(objb.mapPos);
-        anim.SetBool("isMoving", true);
         Tween moveTween = playerTransform.DOMove(newPos, 0.3f).SetEase(Ease.OutQuad);
         yield return moveTween.WaitForCompletion();
-        anim.SetBool("isMoving", false);
     }
 }
 

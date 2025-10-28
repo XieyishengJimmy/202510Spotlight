@@ -20,6 +20,7 @@ public class ListPanelController : MonoBehaviour
         manager = FindObjectOfType<ListsManager>();
         manager.RegisterPanel(this);
         addColumnButton.onClick.AddListener(OnAddColumn);
+        OnAddColumn();
     }
 
     // 初始化由 ListsManager 调用或在 Start 中获取
@@ -62,7 +63,7 @@ public class ListPanelController : MonoBehaviour
 
         // 实例化列，并插入到 addButton 之前（保持按钮在末尾）
         var go = Instantiate(columnPrefab, columnsContent);
-        go.transform.SetSiblingIndex(addColumnButton.transform.GetSiblingIndex());
+        go.transform.SetSiblingIndex(addColumnButton.transform.parent.GetSiblingIndex());
         var ctrl = go.GetComponent<ColumnController>();
         ctrl.Init(this); // 将当前 panel 引入到 column（以便删除时回调）
         columns.Add(ctrl);
@@ -114,7 +115,7 @@ public class ListPanelController : MonoBehaviour
             }
         }
 
-        addColumnButton.GetComponent<Image>().color = canAdd? Color.green:Color.gray;
+        addColumnButton.GetComponent<Image>().color = canAdd? Color.white:Color.gray;
 
     }
 
@@ -132,6 +133,10 @@ public class ListPanelController : MonoBehaviour
         {
             var eGroup = new EffectGroup();
             var columnData = columns[i].ToData(i);
+
+            if (columnData.group == TriggerGroup.None || columnData.effectType == EffectType.None)
+                continue;
+
             eGroup.group = columnData.group;
             eGroup.effect = columnData.effectType;
 

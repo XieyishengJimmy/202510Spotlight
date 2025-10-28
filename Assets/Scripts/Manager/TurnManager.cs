@@ -31,8 +31,6 @@ public class TurnManager : MonoBehaviour
         actionList.Add(newQueue);
     }
 
-
-
     public void TurnAction()
     {
         List<EffectGroup> newEffects = new List<EffectGroup>();

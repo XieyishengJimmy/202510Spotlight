@@ -148,6 +148,7 @@ public class MapManager : MonoBehaviour
             }
 
             objb.oData.mapPos = new Vector2Int(objb.mapPos.x,objb.mapPos.y);
+            objH.SizeAdjust();
             OBJList.Add(objb);
         }
 
@@ -244,7 +245,7 @@ public class MapManager : MonoBehaviour
 
         if (isPlayerDead)
         {
-            Debug.Log("DEAD");
+            PlayerDie(DeadType.DieOfPushY); 
             return;
         }
 
@@ -307,23 +308,12 @@ public class MapManager : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log("des");
+                    LevelManager.instance.Victory();
                 }
             }
         }
     }
 
-
-    ////临时
-    //public void GoOb()
-    //{
-    //    ActionAdd(ob.objb.effectList);
-    //}
-
-    //public void GoOc()
-    //{
-    //    ActionAdd(oc.objb.effectList);
-    //}
 
     //触发之后给回合管理器新的效果列表
     public void ActionAdd(List<EffectGroup> effectGroup)
@@ -493,9 +483,10 @@ public class MapManager : MonoBehaviour
     }
 
     //玩家死亡相关
-    public void PlayerDie()
+    public void PlayerDie(DeadType type)
     {
-
+        player.PlayerDid(type);
+        Debug.Log(123);
     }
 
     //检查是否出界
@@ -540,6 +531,7 @@ public class MapManager : MonoBehaviour
             var tObj = objH.GetComponent<TriggerObject>();
             tObj.effectList = list;
         }
+
     }
 
     public Vector2 GridToWorld(Vector2 pos)
@@ -570,7 +562,6 @@ public class MapManager : MonoBehaviour
             {
                 break;
             }
-                
 
             var occ = mapData[baseX, checkY];
 
@@ -598,13 +589,14 @@ public class MapManager : MonoBehaviour
         }
 
         if (isPlayerDie)
-            Debug.Log("You dead！");
+            PlayerDie(DeadType.DieOfPushY);
 
         // 真正更新
         if (actualAdded > 0)
         {
             ApplyGrowth(objb, actualAdded);
         }
+
     }
 
 
@@ -632,11 +624,14 @@ public class MapManager : MonoBehaviour
         if (occ.isWall)
         {
             if (target.isPlayer)
+            {
                 isPlayerDie = true;
+                MoveObjectUp(target, 1);
+                return true;
+            }
 
             return false;
         }
-            
 
         // 是其他物体 → 递归尝试先顶起它
         if (TryPushUpOne(occ,out isPlayerDie))
@@ -706,6 +701,7 @@ public class MapManager : MonoBehaviour
         int baseY = objb.mapPos.y;
         int checkX = objb.mapPos.x + (isRight?1:-1);
 
+
         for (int i = 0; i < objb.obj.height; i++)
         {
             // 越界 → 停止
@@ -727,7 +723,7 @@ public class MapManager : MonoBehaviour
         }
 
         if (isPlayerDie)
-            Debug.Log("You dead！");
+            PlayerDie(DeadType.DieOfPushX);
 
         // 真正更新
         MoveObjectX(objb, isRight);
@@ -761,19 +757,28 @@ public class MapManager : MonoBehaviour
                     isPlayerMaybeDie = true;
                     continue;
                 }
-
-                return false;
+                else
+                {
+                    return false;
+                }
             }
 
             if (TryPushX(occ, isRight, out isPlayerMaybeDie))
             {
                 continue;
             }
+            else
+            {
+                return false;
+            }
 
         }
 
         if (isPlayerMaybeDie)
+        {
             isPlayerDie = true;
+        }
+            
 
         MoveObjectX(target, isRight);
         return true;
@@ -816,4 +821,10 @@ public enum EffectType
     Reset,
     MoveLeft,
     MoveRight
+}
+
+public enum DeadType
+{
+    DieOfPushX,
+    DieOfPushY
 }

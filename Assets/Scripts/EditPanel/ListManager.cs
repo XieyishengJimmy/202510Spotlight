@@ -37,6 +37,7 @@ public class ListsManager : MonoBehaviour
         iconPanel.SetActive(true);
         MapManager.instance.MapReset();
         TurnManager.instance.EffectClear();
+        TurnManager.instance.readyToMove = false;
     }
 
     public void EditorModelTurnOff()
@@ -44,6 +45,7 @@ public class ListsManager : MonoBehaviour
         isEditing = false;
         mask.SetActive(true);
         iconPanel.SetActive(false);
+        TurnManager.instance.readyToMove = true;
 
         foreach (var list in panels)
         {

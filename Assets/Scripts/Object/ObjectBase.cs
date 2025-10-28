@@ -43,6 +43,35 @@ public class ObjectBase
         }
     }
 
+    public void PlayerDid(DeadType type)
+    {
+        ObjectHandler[] handlers = GameObject.FindObjectsOfType<ObjectHandler>();
+        ObjectHandler playerH = null;
+
+        foreach (var handler in handlers)
+        {
+            if (handler.objb == this)
+            {
+                playerH = handler;
+                break;
+            }
+        }
+
+        switch (type)
+        {
+            case DeadType.DieOfPushX:
+                if(playerH != null)
+                playerH.anim.Play("PlayerDie");
+                break;
+            case DeadType.DieOfPushY:
+                if (playerH != null)
+                    playerH.anim.Play("PlayerDieFall");
+                break;
+            default:
+                break;
+        }
+    }
+
     public void AdjustPosition()
     {
         ObjectHandler[] handlers = GameObject.FindObjectsOfType<ObjectHandler>();

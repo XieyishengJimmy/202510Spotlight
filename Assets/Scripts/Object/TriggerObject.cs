@@ -24,5 +24,8 @@ public enum TriggerGroup
     None,
     GroupA,
     GroupB,
-    GroupC
+    GroupC,
+    ObjectA,
+    ObjectB,
+    ObjectO
 }

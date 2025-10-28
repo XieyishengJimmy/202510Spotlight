@@ -55,7 +55,8 @@ MonoBehaviour:
   listPanelPrefab: {fileID: 6069912815606218559, guid: b1f6180858c50d94cbb14f50a2ddb235, type: 3}
   maxTotalItems: 8
   mask: {fileID: 3648123844405395986}
-  editorModelOn: 0
+  iconPanel: {fileID: 0}
+  isEditing: 0
 --- !u!1 &3648123844405395986
 GameObject:
   m_ObjectHideFlags: 0
@@ -278,6 +279,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 4521900580411385505}
     m_Modifications:
+    - target: {fileID: 1081405470608754261, guid: b1f6180858c50d94cbb14f50a2ddb235, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1081405470608754261, guid: b1f6180858c50d94cbb14f50a2ddb235, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1081405470608754261, guid: b1f6180858c50d94cbb14f50a2ddb235, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1081405470608754261, guid: b1f6180858c50d94cbb14f50a2ddb235, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1785635980742535958, guid: b1f6180858c50d94cbb14f50a2ddb235, type: 3}
       propertyPath: group
       value: 2
@@ -420,6 +437,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 4521900580411385505}
     m_Modifications:
+    - target: {fileID: 1081405470608754261, guid: b1f6180858c50d94cbb14f50a2ddb235, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1081405470608754261, guid: b1f6180858c50d94cbb14f50a2ddb235, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1081405470608754261, guid: b1f6180858c50d94cbb14f50a2ddb235, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1081405470608754261, guid: b1f6180858c50d94cbb14f50a2ddb235, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1785635980742535958, guid: b1f6180858c50d94cbb14f50a2ddb235, type: 3}
       propertyPath: group
       value: 1

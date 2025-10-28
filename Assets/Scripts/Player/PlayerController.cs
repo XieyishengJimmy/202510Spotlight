@@ -57,11 +57,9 @@ public class PlayerController : MonoBehaviour
                     //MapManager.instance.PlayerMove(new Vector2Int(0, -1));
                     break;
                 case PlayerAction.A:
-                    anim.SetBool("isRight", false);
                     MapManager.instance.PlayerMove(new Vector2Int(-1, 0));
                     break;
                 case PlayerAction.D:
-                    anim.SetBool("isRight", true);
                     MapManager.instance.PlayerMove(new Vector2Int(1, 0));
                     break;
                 default:
