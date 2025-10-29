@@ -56,7 +56,15 @@ public class TurnManager : MonoBehaviour
 
 
         int delta =  MapManager.instance.SimGravity(MapManager.instance.player);
+        if(delta>1)
+            MapManager.instance.isPlayerDead = true;
 
+        if (MapManager.instance.isPlayerDead)
+        {
+            MapManager.instance.PlayerDie(DeadType.DieOfPushY); 
+            return;
+        }
+        
         turnCount++;
         readyToMove = true;
     }

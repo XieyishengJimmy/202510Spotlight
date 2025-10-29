@@ -778,6 +778,16 @@ public class MapManager : MonoBehaviour
             if (item.readyToBePush)
             {
                 MoveObjectX(item, isRight);
+                
+            }
+
+        }
+
+        foreach (var item in OBJList)
+        {
+            if (item.readyToBePush)
+            {
+                MoveObjectXWrite(item, isRight);
                 item.readyToBePush = false;
             }
 
@@ -862,10 +872,12 @@ public class MapManager : MonoBehaviour
             mapData[p.x, p.y] = null;
         }
         target.gridLock.Clear();
-
         // 更新位置
         target.mapPos = new Vector2Int(target.mapPos.x + (isRight?1:-1), target.mapPos.y);
+    }
 
+    private void MoveObjectXWrite(ObjectBase target, bool isRight)
+    {
         // 写入新位置
         for (int dy = 0; dy < target.obj.height; dy++)
         {
@@ -874,7 +886,6 @@ public class MapManager : MonoBehaviour
             target.gridLock.Add(pos);
         }
         target.AdjustPosition();
-        Debug.Log(target.isPlayer);
     }
 
 
