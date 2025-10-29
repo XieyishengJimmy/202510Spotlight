@@ -140,7 +140,7 @@ public class MapManager : MonoBehaviour
             }
 
             objb.mapPos = new Vector2Int((int)pos.x, (int)pos.y);
-
+            OBJList.Add(objb);
             if (objb.isPlayer)
             {
                 player = objb;
@@ -149,7 +149,7 @@ public class MapManager : MonoBehaviour
 
             objb.oData.mapPos = new Vector2Int(objb.mapPos.x,objb.mapPos.y);
             objH.SizeAdjust();
-            OBJList.Add(objb);
+
         }
 
         //获取功能物品位置
@@ -240,8 +240,13 @@ public class MapManager : MonoBehaviour
         TurnManager.instance.readyToMove = false;
 
         PlayerPosChange(dir);
-        if (SimGravity(player) > 1)
+        int fall = SimGravity(player);
+        if (fall > 1)
+        {
+            Debug.Log(fall);
             isPlayerDead = true;
+        }
+            
 
         if (isPlayerDead)
         {
@@ -447,6 +452,18 @@ public class MapManager : MonoBehaviour
         }
         else
         {
+            foreach (var pos in objb.gridLock)
+            {
+                mapData[pos.x, pos.y] = null;
+            }
+
+            objb.gridLock.Clear();
+
+            for (int i = 0; i < objb.obj.height; i++)
+            {
+                mapData[objb.mapPos.x, objb.mapPos.y + i] = objb;
+                objb.gridLock.Add(new Vector2Int(objb.mapPos.x, objb.mapPos.y + i));
+            }
             objb.AdjustAll();
         }
     }
@@ -697,91 +714,143 @@ public class MapManager : MonoBehaviour
     //物体尝试向左右移动（计算所有Y）
     public void TryMoveXOne(ObjectBase objb, bool isRight)
     {
-        bool isPlayerDie = false;
+        int baseX = objb.mapPos.x;
         int baseY = objb.mapPos.y;
-        int checkX = objb.mapPos.x + (isRight?1:-1);
+        int topY = baseY + objb.obj.height - 1;
 
+        bool isCarryP = false;
+        if (mapData[baseX, topY + 1] != null)
+        {
+            if (mapData[baseX, topY + 1].isPlayer)
+                isCarryP = true;
+        }
 
+        bool isSelfCanMove = false;
+
+        List<ObjectBase> waitToPush = new List<ObjectBase>();
         for (int i = 0; i < objb.obj.height; i++)
         {
-            // 越界 → 停止
-            if (!IsInsideGrid(new Vector2Int(checkX, baseY + i)))
+            Vector2Int checkPos = new Vector2Int(isRight ? baseX + 1 : baseX - 1, baseY + i);
+            if (!IsInsideGrid(checkPos))
+                return;
+
+            var occ = mapData[checkPos.x,checkPos.y];
+            if (occ == null)
+            {
+                continue;
+            }
+
+            if (occ.isWall)
             {
                 return;
             }
 
-            var occ = mapData[checkX, baseY + i];
-
-            if (occ == null)
-                continue;
-
-            if (occ.isWall)
-                return;
-
-            if (!TryPushX(occ, isRight, out isPlayerDie))
-                return;
+            // 是其他物体 → 递归尝试先顶起它
+            waitToPush.Add(occ);
         }
 
-        if (isPlayerDie)
-            PlayerDie(DeadType.DieOfPushX);
+        if (waitToPush.Count == 0)
+            isSelfCanMove = true;
+        else
+        {
+            foreach (var item in waitToPush)
+            {
+                if (!TryPushX(item, isRight))
+                {
+                    isSelfCanMove = false;
+                    break;
+                }
+                else
+                    isSelfCanMove = true;
+            }
+        }
 
-        // 真正更新
-        MoveObjectX(objb, isRight);
+        if (isCarryP)
+            TryPushX(player, isRight);
+
+        if (isSelfCanMove)
+        {
+            objb.readyToBePush = true;
+        }
+        
+        foreach (var item in OBJList)
+        {
+            if (item.readyToBePush)
+            {
+                MoveObjectX(item, isRight);
+                item.readyToBePush = false;
+            }
+
+        }
 
     }
 
-    private bool TryPushX(ObjectBase target, bool isRight, out bool isPlayerDie)
+
+    public bool TryPushX(ObjectBase objb, bool isRight)
     {
-        isPlayerDie = false;
-        bool isPlayerMaybeDie = false;
-        int baseY = target.mapPos.y;
-        int checkX = target.mapPos.x + (isRight ? 1 : -1);
+        int baseX = objb.mapPos.x;
+        int baseY = objb.mapPos.y;
+        int topY = baseY + objb.obj.height - 1;
 
-        for (int i = 0; i < target.obj.height; i++)
+        bool isCarryP = false;
+        if (mapData[baseX, topY + 1]!=null)
         {
-            // 越界 → 停止
-            if (!IsInsideGrid(new Vector2Int(checkX, baseY + i)))
-            {
-                return false;
-            }
-
-            var occ = mapData[checkX, baseY + i];
-
-            if (occ == null)
-                continue;
-
-            if (occ.isWall)
-            {
-                if (target.isPlayer)
-                {
-                    isPlayerMaybeDie = true;
-                    continue;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-
-            if (TryPushX(occ, isRight, out isPlayerMaybeDie))
-            {
-                continue;
-            }
-            else
-            {
-                return false;
-            }
-
-        }
-
-        if (isPlayerMaybeDie)
-        {
-            isPlayerDie = true;
+            if(mapData[baseX, topY + 1].isPlayer)
+                isCarryP = true;
         }
             
 
-        MoveObjectX(target, isRight);
-        return true;
+        bool isSelfCanMove = false;
+        List<ObjectBase> waitToPush = new List<ObjectBase>();
+        for (int i = 0; i < objb.obj.height; i++)
+        {
+            Vector2Int checkPos = new Vector2Int(isRight ? baseX + 1 : baseX - 1, baseY + i);
+            if (!IsInsideGrid(checkPos))
+                return false;
+
+            var occ = mapData[checkPos.x, checkPos.y];
+
+            if (occ == null)
+            {
+                continue;
+            }
+
+            if (occ.isWall)
+            {
+                return false;
+            }
+
+            // 是其他物体 → 递归尝试先顶起它
+            waitToPush.Add(occ);
+        }
+
+        if (waitToPush.Count == 0)
+            isSelfCanMove = true;
+        else
+        {
+            foreach (var item in waitToPush)
+            {
+                if (!TryPushX(item, isRight))
+                {
+                    isSelfCanMove = false;
+                    break;
+                }
+                else
+                    isSelfCanMove = true;
+            }
+        }
+
+        if (isCarryP)
+            TryPushX(player, isRight);
+
+
+        if (isSelfCanMove)
+        {
+            objb.readyToBePush = true;
+            return true;
+        }
+        else
+            return false;
 
     }
 
@@ -796,7 +865,6 @@ public class MapManager : MonoBehaviour
 
         // 更新位置
         target.mapPos = new Vector2Int(target.mapPos.x + (isRight?1:-1), target.mapPos.y);
-        target.AdjustPosition();
 
         // 写入新位置
         for (int dy = 0; dy < target.obj.height; dy++)
@@ -805,6 +873,8 @@ public class MapManager : MonoBehaviour
             mapData[pos.x, pos.y] = target;
             target.gridLock.Add(pos);
         }
+        target.AdjustPosition();
+        Debug.Log(target.isPlayer);
     }
 
 

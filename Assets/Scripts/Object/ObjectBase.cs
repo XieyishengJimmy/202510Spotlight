@@ -19,6 +19,8 @@ public class ObjectBase
 
     public OriginalData oData;
 
+    public bool readyToBePush = false;
+
 
     public virtual void Init() { }
 

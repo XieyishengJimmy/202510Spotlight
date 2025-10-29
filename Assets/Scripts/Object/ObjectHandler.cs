@@ -17,6 +17,8 @@ public class ObjectHandler : MonoBehaviour
 
     public Vector2Int oSize;
 
+
+
     private void Awake()
     {
         sp = transform.GetChild(0).gameObject.GetComponent<SpriteRenderer>();
